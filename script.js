@@ -10,6 +10,36 @@ const secondsToHms = d => {
   return arr.join(', ');
 }
 
+// Copies a string to the clipboard. Must be called from within an
+// event handler such as click. May return false if it failed, but
+// this is not always possible. Browser support for Chrome 43+,
+// Firefox 42+, Safari 10+, Edge and Internet Explorer 10+.
+// Internet Explorer: The clipboard feature may be disabled by
+// an administrator. By default a prompt is shown the first
+// time the clipboard is used (per session).
+const copyToClipboard = text => {
+  if (window.clipboardData && window.clipboardData.setData) {
+    // Internet Explorer-specific code path to prevent textarea being shown while dialog is visible.
+    return window.clipboardData.setData("Text", text);
+  } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+    let textarea = document.createElement("textarea");
+    textarea.textContent = text;
+    textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in Microsoft Edge.
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      return document.execCommand("copy");  // Security exception may be thrown by some browsers.
+    }
+    catch (ex) {
+      console.warn("Copy to clipboard failed.", ex);
+      return false;
+    }
+    finally {
+      document.body.removeChild(textarea);
+    }
+  }
+}
+
 (() => {
   const table = $('#table').DataTable({
     dom: `
@@ -75,4 +105,25 @@ const secondsToHms = d => {
       });
     }
   });
+
+  new Vue({
+    el: "#app",
+    data: {
+      parent: "SPACE",
+      story: "",
+      verb: "FIX",
+      description: ""
+    },
+    methods: {
+      copy_branch_name(){
+        const branch_name = this.$refs.branch_name;
+        copyToClipboard(branch_name.innerText);
+      },
+      copy_branch_checkout(){
+        var branch_checkout = this.$refs.checkout;
+        copyToClipboard(branch_checkout.innerText);
+      }
+    }
+  })
+
 })();

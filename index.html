@@ -23,9 +23,11 @@
           src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
   <script type="text/javascript"
           src="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.11.4/b-2.2.2/b-html5-2.2.2/b-print-2.2.2/datatables.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 </head>
 <body>
 	<div class="container mt-2">
+    <h1>Time sheet collator</h1>
     <div class="row">
       <div class="col mb-5">
         <input type="file"
@@ -38,6 +40,57 @@
         <table id="table"
                class="table table-striped"
                style="width:100%"></table>
+      </div>
+    </div>
+    <hr/>
+    <h1>BitBucket Branch Namer</h1>
+    <div id="app">
+      <div class="row mb-2">
+        <div class="col">
+          <select class="form-select"
+                  v-model="parent">
+            <option selected>DO</option>
+            <option>SPACE</option>
+            <option>DR</option>
+          </select>
+        </div>
+        <div class="col">
+          <input type="text"
+                 class="form-control"
+                 v-model="story"
+                 placeholder="XXX">
+        </div>
+        <div class="col">
+          <select class="form-select"
+                  v-model="verb">
+            <option>ADD</option>
+            <option>REMOVE</option>
+            <option selected>FIX</option>
+            <option>CHANGE</option>
+          </select>
+        </div>
+        <div class="col">
+          <input type="text"
+                 class="form-control"
+                 v-model="description"
+                 placeholder="Description">
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col">
+          <strong>Branch name:</strong>
+          <span ref="branch_name">{{parent}}-{{story}}:{{verb}}: {{description}}</span>
+          <button class="btn btn-primary"
+                  v-on:click="copy_branch_name">copy branch name</button>
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col">
+          <strong>Command:</strong>
+          <span ref="checkout">git checkout -b {{parent}}-{{story}}-{{description.replace(/\W/g, '_')}}</span>
+          <button class="btn btn-primary"
+                  v-on:click="copy_branch_checkout">copy checkout command</button>
+        </div>
       </div>
     </div>
   </div>
