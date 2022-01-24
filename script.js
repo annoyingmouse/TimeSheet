@@ -1,18 +1,33 @@
-$(document).ready( function () {
-  const secondsToHms = d => {
-    d = Number(d);
-    const h = Math.floor(d / 3600);
-    const m = Math.floor(d % 3600 / 60);
-    const s = Math.floor(d % 3600 % 60);
-    const arr = []
-    if(h > 0) arr.push(h + (h == 1 ? " hour" : " hours"))
-    if(m > 0) arr.push(m + (m == 1 ? " minute" : " minutes"))
-    if(s > 0) arr.push(s + (s == 1 ? " second" : " seconds"))
-    return arr.join(', ');
-  }
+const secondsToHms = d => {
+  d = Number(d);
+  const h = Math.floor(d / 3600);
+  const m = Math.floor(d % 3600 / 60);
+  const s = Math.floor(d % 3600 % 60);
+  const arr = []
+  if(h > 0) arr.push(h + (h == 1 ? " hour" : " hours"))
+  if(m > 0) arr.push(m + (m == 1 ? " minute" : " minutes"))
+  if(s > 0) arr.push(s + (s == 1 ? " second" : " seconds"))
+  return arr.join(', ');
+}
+
+(() => {
   const table = $('#table').DataTable({
+    dom: `
+      <"row"
+        <"col"l>
+        <"col text-center"B>
+        <"col"f>
+      >
+      <"row"
+        <"col"t>
+      >
+      <"row"
+        <"col"i>
+        <"col"p>
+      >
+      r`,
     buttons: [
-        'excel'
+      'copy', 'excel', 'pdf'
     ],
     columns: [
       {
@@ -25,10 +40,12 @@ $(document).ready( function () {
       }
     ]
   });
-  const csvInput = document.getElementById('csvInput')
+
   const tasks = []
   const regex = /[A-Z]*-[0-9]+/g;
-  csvInput.addEventListener('change', () => {
+
+  document.getElementById('csvInput').addEventListener('change', (e) => {
+    const csvInput = e.target
     if ('files' in csvInput) {
       tasks.length = 0
       table.clear().draw();
@@ -58,4 +75,4 @@ $(document).ready( function () {
       });
     }
   });
-});
+})();
